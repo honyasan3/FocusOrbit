@@ -1,0 +1,154 @@
+:root {
+    --bg-color: #fff;
+    --bg-color-alt: #e9ecef;
+    --bg-color-hover: #f8f9fa;
+    --body-bg: rgba(0, 0, 0, 0.1);
+
+    --primary-color: #007bff;
+    --primary-color-glow: rgba(0, 123, 255, 0.25);
+
+    --border-color: #ddd;
+    --border-radius-sm: 4px;
+    --border-radius-md: 6px;
+    --border-radius-lg: 8px;
+
+    --shadow-color: rgba(0, 0, 0, 0.15);
+
+    --scrollbar-thumb-color: #ccc;
+    --scrollbar-thumb-color-hover: #999;
+
+    /* テキストカラーの変数を追加 */
+    --text-color: #333;
+    --text-muted: #666;
+}
+
+/* OSの設定に応じた自動ダークモード対応（カスタマイズの土台） */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #222;
+        --bg-color-alt: #333;
+        --bg-color-hover: #2a2a2a;
+        --body-bg: rgba(0, 0, 0, 0.5);
+        --border-color: #444;
+        --text-color: #eee;
+        --text-muted: #aaa;
+    }
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--body-bg); /* Slightly transparent background for the popup window */
+    overflow: hidden; /* Hide scrollbars */
+    color: var(--text-color);
+}
+
+#palette-container {
+    background-color: var(--bg-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 4px 12px var(--shadow-color);
+    margin: 20px; /* Adjust as needed for centering/padding */
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 40px); /* Fill available height */
+}
+
+#search-input {
+    width: 100%;
+    padding: 12px 10px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    font-size: 16px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    outline: none;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+#search-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-color-glow);
+}
+
+#results-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto; /* Scroll for results */
+    flex-grow: 1; /* Allow list to take available space */
+}
+
+/* Custom scrollbar for WebKit browsers */
+#results-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+#results-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#results-list::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb-color);
+    border-radius: var(--border-radius-sm);
+}
+
+#results-list::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-color-hover);
+}
+
+#results-list li {
+    padding: 10px;
+    cursor: pointer;
+    border-radius: var(--border-radius-sm);
+    transition: background-color 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#results-list li.selected {
+    background-color: var(--bg-color-alt);
+}
+
+#results-list li:not(.selected):hover {
+    background-color: var(--bg-color-hover);
+}
+
+/* --- タブ情報の表示用クラス --- */
+.tab-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.tab-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-grow: 1;
+}
+
+.tab-title {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tab-url {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}

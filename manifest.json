@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "FocusOrbit Template",
+  "version": "1.0",
+  "description": "A template for FocusOrbit Chrome Extension, demonstrating context switching.",
+  "permissions": [
+    "tabs",
+    "storage",
+    "alarms",
+    "activeTab"
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "128": "icons/icon128.png"
+    }
+  },
+  "commands": {
+    "open_palette": {
+      "suggested_key": {
+        "default": "Ctrl+K",
+        "mac": "Command+K"
+      },
+      "description": "Open the FocusOrbit Command Palette"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
