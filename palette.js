@@ -1,108 +1,52 @@
-document.addEventListener('DOMContentLoaded', async () => {
-    const searchInput = document.getElementById('search-input');
-    const resultsList = document.getElementById('results-list');
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('searchInput');
+    const resultsUl = document.getElementById('results');
+    let items = [];
+    let filtered = [];
+    let cursor = 0;
 
-    let allItems = []; // Combined list of live tabs and archived items
-    let filteredItems = [];
-    let selectedIndex = -1;
+    chrome.runtime.sendMessage({ action: 'getData' }, (res) => {
+        if (!res) return;
+        const live = res.liveTabs.filter(t => t.url.startsWith('http')).map(t => ({...t, type: 'LIVE'}));
+        const arch = res.archive.map(a => ({...a, type: 'ARCHIVE'}));
+        items = [...live, ...arch];
+        renderList('');
+    });
 
-    // Function to fetch all tabs and archived items from background script
-    async function fetchPaletteData() {
-        return new Promise((resolve) => {
-            chrome.runtime.sendMessage({ action: 'getPaletteData' }, (response) => {
-                if (response) {
-                    // Combine and sort items (e.g., live tabs first, then archived)
-                    allItems = [...response.tabs, ...response.archived];
-                    // Optionally sort by title or last accessed for initial display
-                    allItems.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
-                }
-                resolve();
-            });
+    function renderList(query) {
+        const q = query.toLowerCase();
+        filtered = items.filter(i => (i.title && i.title.toLowerCase().includes(q)) || (i.url && i.url.toLowerCase().includes(q)));
+        
+        resultsUl.innerHTML = '';
+        filtered.forEach((item, idx) => {
+            const li = document.createElement('li');
+            li.className = `p-3 mb-1 rounded cursor-pointer flex flex-col gap-1 ${idx === cursor ? 'bg-blue-50 border-l-4 border-blue-500' : 'hover:bg-gray-50 border-l-4 border-transparent'}`;
+            const badge = item.type === 'LIVE' 
+                ? '<span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded">Live</span>' 
+                : '<span class="px-2 py-0.5 bg-gray-200 text-gray-600 text-xs rounded">Archive</span>';
+            
+            li.innerHTML = `<div class="flex items-center gap-2"><div class="truncate text-sm font-medium text-gray-800">${badge} ${item.title || item.url}</div></div>`;
+            li.onclick = () => activate(item);
+            resultsUl.appendChild(li);
         });
     }
 
-    // Function to render results based on search query
-    function renderResults(query = '') {
-        resultsList.innerHTML = '';
-        selectedIndex = -1;
-
-        if (query) {
-            // Simple fuzzy search: check if query is included in title or URL
-            filteredItems = allItems.filter(item =>
-                (item.title && item.title.toLowerCase().includes(query.toLowerCase())) ||
-                (item.url && item.url.toLowerCase().includes(query.toLowerCase()))
-            );
+    function activate(item) {
+        if (item.type === 'LIVE') {
+            chrome.windows.update(item.windowId, { focused: true });
+            chrome.tabs.update(item.id, { active: true });
         } else {
-            filteredItems = [...allItems]; // Show all if no query
+            chrome.tabs.create({ url: item.url });
         }
-
-        if (filteredItems.length === 0) {
-            const li = document.createElement('li');
-            li.textContent = 'No results found.';
-            resultsList.appendChild(li);
-            return;
-        }
-
-        filteredItems.forEach((item, index) => {
-            const li = document.createElement('li');
-            const favIcon = item.favIconUrl ? `<img src="${item.favIconUrl}" style="width:16px;height:16px;vertical-align:middle;margin-right:5px;">` : '';
-            li.innerHTML = `${favIcon}<strong>${item.title || item.url}</strong><br><small>${item.url}</small>`;
-            li.dataset.index = index;
-            li.addEventListener('click', () => activateItem(item));
-            resultsList.appendChild(li);
-        });
-
-        if (filteredItems.length > 0) {
-            selectedIndex = 0;
-            resultsList.children[selectedIndex].classList.add('selected');
-        }
+        window.close();
     }
 
-    // Function to activate a selected item
-    function activateItem(item) {
-        chrome.runtime.sendMessage({ action: 'activatePaletteItem', item: item });
-        window.close(); // Close the palette after activation
-    }
-
-    // Event Listeners
-    searchInput.addEventListener('input', (event) => {
-        renderResults(event.target.value);
+    input.addEventListener('input', (e) => { cursor = 0; renderList(e.target.value); });
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown') { cursor = (cursor + 1) % filtered.length; renderList(input.value); }
+        if (e.key === 'ArrowUp') { cursor = (cursor - 1 + filtered.length) % filtered.length; renderList(input.value); }
+        if (e.key === 'Enter') activate(filtered[cursor]);
+        if (e.key === 'Escape') window.close();
     });
-
-    searchInput.addEventListener('keydown', (event) => {
-        if (filteredItems.length === 0) return;
-
-        const currentSelected = resultsList.children[selectedIndex];
-        if (currentSelected) {
-            currentSelected.classList.remove('selected');
-        }
-
-        if (event.key === 'ArrowDown') {
-            event.preventDefault(); // Prevent cursor movement in input
-            selectedIndex = (selectedIndex + 1) % filteredItems.length;
-        } else if (event.key === 'ArrowUp') {
-            event.preventDefault(); // Prevent cursor movement in input
-            selectedIndex = (selectedIndex - 1 + filteredItems.length) % filteredItems.length;
-        } else if (event.key === 'Enter') {
-            event.preventDefault();
-            if (selectedIndex !== -1) {
-                activateItem(filteredItems[selectedIndex]);
-            }
-            return;
-        } else if (event.key === 'Escape') {
-            window.close(); // Close the palette
-            return;
-        }
-
-        const newSelected = resultsList.children[selectedIndex];
-        if (newSelected) {
-            newSelected.classList.add('selected');
-            newSelected.scrollIntoView({ block: 'nearest' }); // Scroll to selected item
-        }
-    });
-
-    // Initial load
-    await fetchPaletteData();
-    renderResults();
-    searchInput.focus(); // Focus the search input on open
+    input.focus();
 });

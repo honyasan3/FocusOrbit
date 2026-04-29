@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head><script src="https://cdn.tailwindcss.com"></script></head>
+<body class="p-6 bg-gray-50 text-gray-800">
+    <h1 class="text-2xl font-bold mb-4">FocusOrbit 設定</h1>
+    <div class="bg-white p-4 rounded shadow max-w-md">
+        <label class="block text-sm font-medium mb-1">非アクティブタブをアーカイブするまでの時間（分）</label>
+        <input type="number" id="timeInput" min="1" class="border p-2 rounded w-full mb-3">
+        <button id="saveBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">保存</button>
+        <span id="msg" class="ml-3 text-green-600 text-sm hidden">保存しました！</span>
+    </div>
+    <script src="options.js"></script>
+</body>
+</html>

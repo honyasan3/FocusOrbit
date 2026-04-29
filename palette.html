@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-    <title>FocusOrbit Palette</title>
-    <link rel="stylesheet" href="palette.css">
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div id="palette-container">
-        <input type="text" id="search-input" placeholder="Search tabs and archives...">
-        <ul id="results-list">
-            <!-- Search results will be injected here -->
-        </ul>
+<body class="bg-gray-900/40 w-full h-full p-4 box-border m-0 overflow-hidden">
+    <div class="bg-white rounded-xl shadow-2xl max-w-xl mx-auto flex flex-col h-[400px] overflow-hidden">
+        <div class="p-3 border-b bg-gray-50">
+            <input type="text" id="searchInput" placeholder="タブやアーカイブを検索..." class="w-full text-lg px-3 py-2 bg-white border rounded outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <ul id="results" class="flex-1 overflow-y-auto p-2 m-0 list-none"></ul>
     </div>
     <script src="palette.js"></script>
 </body>

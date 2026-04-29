@@ -1,17 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
+    <meta charset="UTF-8">
     <title>FocusOrbit</title>
-    <style>
-        body { font-family: sans-serif; width: 200px; padding: 10px; }
-        button { width: 100%; padding: 10px; margin-bottom: 5px; cursor: pointer; border: 1px solid #ccc; background-color: #f0f0f0; border-radius: 4px; }
-        button:hover { background-color: #e0e0e0; }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style> body { width: 260px; } </style>
 </head>
-<body>
-    <h1>Switch Context</h1>
-    <button id="workButton">Work</button>
-    <button id="personalButton">Personal</button>
+<body class="bg-gray-50 p-4 font-sans text-gray-800">
+    <h1 class="text-lg font-bold border-b pb-2 mb-3 text-blue-600 flex items-center justify-between">
+        FocusOrbit
+        <a href="#" id="optionsBtn" class="text-xs text-gray-400 hover:text-gray-600">設定</a>
+    </h1>
+    
+    <div id="ctxList" class="space-y-2 mb-4"></div>
+
+    <div class="flex gap-2">
+        <input type="text" id="newCtxName" placeholder="新しいグループ名" class="flex-1 px-2 py-1 text-sm border rounded focus:outline-none focus:border-blue-500">
+        <button id="addCtxBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium transition">+</button>
+    </div>
     <script src="popup.js"></script>
 </body>
 </html>
