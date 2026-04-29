@@ -48,6 +48,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       handleSearchTabs(message.payload, sendResponse);
       return true;
 
+    case "DELETE_CONTEXT":
+      handleDeleteContext(message.payload, sendResponse);
+      return true;
+
     default:
       console.warn(`FocusOrbit: Unknown action received - ${message.action}`);
       return false;
@@ -342,5 +346,33 @@ async function autoArchiveTabs() {
 
   } catch (error) {
     console.error("FocusOrbit: Error in autoArchiveTabs:", error);
+  }
+}
+
+async function handleDeleteContext(payload, sendResponse) {
+  try {
+    const { contextId } = payload;
+    const data = await chrome.storage.local.get(["contexts", "activeContextId"]);
+    let contexts = data.contexts || [];
+
+    // 安全装置: アクティブなコンテキストとDefaultは削除不可
+    if (contextId === data.activeContextId) {
+      throw new Error("Cannot delete the active context.");
+    }
+    if (contextId === "context-default") {
+      throw new Error("Cannot delete the default context.");
+    }
+
+    // 指定されたコンテキストを除外した新しい配列を作成
+    contexts = contexts.filter(c => c.id !== contextId);
+    
+    // Storageを更新
+    await chrome.storage.local.set({ contexts: contexts });
+
+    console.log(`FocusOrbit: Deleted context ${contextId}`);
+    sendResponse({ success: true });
+  } catch (error) {
+    console.error("Error in DELETE_CONTEXT:", error);
+    sendResponse({ success: false, error: error.message });
   }
 }
