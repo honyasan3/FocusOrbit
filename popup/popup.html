@@ -5,159 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FocusOrbit</title>
   <style>
-    /* 拡張機能ポップアップの基本設定 */
-    body {
-      width: 320px;
-      min-height: 400px;
-      margin: 0;
-      padding: 16px;
-      font-family: system-ui, -apple-system, sans-serif;
-      background-color: #f9fafb;
-      color: #1f2937;
-    }
-    
-    /* ヘッダー周り */
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #e5e7eb;
-      padding-bottom: 12px;
-    }
-    h1 {
-      font-size: 1.125rem;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 0;
-    }
-    
-    /* リスト周り */
-    h2 {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #6b7280;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 12px;
-      margin-top: 0;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+    body { width: 320px; min-height: 400px; margin: 0; padding: 16px; font-family: system-ui, -apple-system, sans-serif; background-color: #f9fafb; color: #1f2937; }
+    header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; }
+    h1 { font-size: 1.125rem; font-weight: bold; display: flex; align-items: center; gap: 8px; margin: 0; }
+    h2 { font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; margin-top: 0; }
+    ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
 
-    /* popup.js から付与されるクラスのスタイル */
-    .context-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      border: 1px solid #e5e7eb;
-      background: #fff;
-      transition: all 0.2s;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    }
-    .context-item:hover {
-      background: #f3f4f6;
-      border-color: #d1d5db;
-    }
-    .context-item.active {
-      background: #eff6ff;
-      border-color: #bfdbfe;
-      box-shadow: inset 0 0 0 1px rgba(59,130,246,0.2);
-    }
-    .context-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .color-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-    }
-    .context-name {
-      font-weight: 500;
-      color: #374151;
-    }
-    .context-item.active .context-name {
-      font-weight: 700;
-      color: #1e40af;
-    }
-    .badge-active {
-      font-size: 10px;
-      color: #2563eb;
-      background: #dbeafe;
-      padding: 2px 8px;
-      border-radius: 9999px;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-    .msg-empty, .msg-error {
-      text-align: center;
-      font-size: 0.875rem;
-      padding: 16px 0;
-    }
+    /* コンテキストアイテムのスタイル */
+    .context-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; cursor: pointer; border: 1px solid #e5e7eb; background: #fff; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .context-item:hover { background: #f3f4f6; border-color: #d1d5db; }
+    .context-item.active { background: #eff6ff; border-color: #bfdbfe; box-shadow: inset 0 0 0 1px rgba(59,130,246,0.2); }
+    
+    .context-info { display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+    .context-left { display: flex; align-items: center; gap: 12px; }
+    .color-dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); flex-shrink: 0;}
+    .context-name { font-weight: 500; color: #374151; }
+    .context-item.active .context-name { font-weight: 700; color: #1e40af; }
+    
+    /* 追加: タブプレビュー用のスタイル */
+    .tab-preview { display: flex; align-items: center; gap: 8px; padding-left: 24px; }
+    .favicon-list { display: flex; align-items: center; }
+    .favicon { width: 16px; height: 16px; border-radius: 4px; border: 1px solid #fff; background-color: #f3f4f6; margin-left: -6px; }
+    .favicon:first-child { margin-left: 0; }
+    .tab-count { font-size: 0.7rem; color: #6b7280; font-weight: 500; }
+
+    .badge-active { font-size: 10px; color: #2563eb; background: #dbeafe; padding: 2px 8px; border-radius: 9999px; font-weight: bold; text-transform: uppercase; }
+    .msg-empty, .msg-error { text-align: center; font-size: 0.875rem; padding: 16px 0; }
     .msg-empty { color: #6b7280; }
     .msg-error { color: #ef4444; }
-.create-container {
-      margin-top: 24px;
-      padding-top: 16px;
-      border-top: 1px solid #e5e7eb;
-    }
-    .input-group {
-      display: flex;
-      gap: 8px;
-    }
-    input[type="text"] {
-      flex-grow: 1;
-      padding: 8px 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      outline: none;
-      font-size: 0.875rem;
-    }
-    input[type="text"]:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 1px #3b82f6;
-    }
-    button {
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-size: 0.875rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    button:hover {
-      background: #1d4ed8;
-    }
-    button:disabled {
-      background: #9ca3af;
-      cursor: not-allowed;
-    }
+
+    /* 新規作成フォーム */
+    .create-container { margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
+    .input-group { display: flex; gap: 8px; }
+    input[type="text"] { flex-grow: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; outline: none; font-size: 0.875rem; }
+    input[type="text"]:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
+    button { background: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background 0.2s; }
+    button:hover { background: #1d4ed8; }
+    button:disabled { background: #9ca3af; cursor: not-allowed; }
   </style>
 </head>
 <body>
   
   <header>
     <h1>
-      <svg style="width: 24px; height: 24px; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-      </svg>
+      <svg style="width: 24px; height: 24px; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
       FocusOrbit
     </h1>
   </header>
@@ -165,8 +56,9 @@
   <main>
     <h2>Your Contexts</h2>
     <ul id="context-list">
-      <!-- popup.js でここにリストアイテムをインジェクトします -->
+      <!-- popup.js でインジェクト -->
     </ul>
+
     <div class="create-container">
       <h2>Create New Context</h2>
       <div class="input-group">
