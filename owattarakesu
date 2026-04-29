@@ -1,0 +1,25 @@
+### 【Phase 1】基盤構築とメッセージパッシング
+> Chrome拡張機能 (Manifest V3) を開発します。
+> まず、`manifest.json` を作成し、`permissions` に `tabs`, `storage`, `alarms` を追加してください。
+> 次に、`background.js` のスケルトンを作成してください。Service Workerのライフサイクルを考慮し、状態はすべて `chrome.storage.local` に保存します。
+> `chrome.runtime.onMessage.addListener` を使用して、`action: "SWITCH_CONTEXT"` などのメッセージを受け取るルーティング部分だけを、switch文で実装してください。
+
+### 【Phase 2】コンテキスト切り替えロジックの核
+> `background.js` にコンテキスト切り替えのロジック `handleContextSwitch(targetContextId)` を実装します。
+> 仕様書の「3.1 コンテキスト切り替えの厳密な手順」に完全に沿ってコーディングしてください。
+> 特に、`chrome://` や `pinned: true` のタブを除外する処理と、ウィンドウが閉じないように「新しいタブを作成してから古いタブを削除する」順序を厳守してください。
+
+### 【Phase 3】自動アーカイブと例外処理
+> `background.js` に、`chrome.alarms` を使った自動アーカイブロジックを追加します。
+> 1分ごとに動作するアラームを作成し、最後にアクティブになってから指定時間（例:60分）経過したタブを閉じ、`archiveList` に保存してください。
+> **絶対に守るべき条件**: `audible: true` (音声再生中) のタブと、ピン留めされたタブはアーカイブ対象から除外してください。
+
+### 【Phase 4】Popup UIの構築
+> `popup/popup.html` と `popup.js` を作成します。
+> Tailwind CSS (CDN) を使用して、モダンなUIにしてください。
+> `chrome.storage.local` から `contexts` の配列を読み込み、リスト表示します。各コンテキストをクリックすると、`chrome.runtime.sendMessage` で `SWITCH_CONTEXT` アクションをBackgroundに送信する処理を書いてください。
+
+### 【Phase 5】Shadow DOMを用いたコマンドパレット
+> `content_scripts` として機能する `palette.js` を作成します。
+> キーボードショートカット (例: Alt+Shift+K) を検知したら、現在のページのDOMに Shadow DOM を使って検索モーダルを挿入してください。
+> 背景サイトのCSSと干渉しないように注意し、開いているタブと `archiveList` を横断してインクリメンタル検索できるUIを構築してください。

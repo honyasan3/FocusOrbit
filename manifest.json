@@ -2,31 +2,23 @@
   "manifest_version": 3,
   "name": "FocusOrbit",
   "version": "1.0.0",
-  "description": "タブの文脈（コンテキスト）を切り替え、脳の認知負荷を最小化する拡張機能",
+  "description": "Reduce cognitive load by managing tabs with contexts and smart archiving.",
   "permissions": [
     "tabs",
     "storage",
-    "alarms",
-    "activeTab"
+    "alarms"
   ],
-  "action": {
-    "default_popup": "popup/popup.html",
-    "default_title": "コンテキストを切り替える"
-  },
-  "options_page": "options/options.html",
-  "commands": {
-    "open_palette": {
-      "suggested_key": {
-        "default": "Ctrl+K",
-        "mac": "Command+K"
-      },
-      "description": "FocusOrbit コマンドパレットを開く"
-    }
-  },
   "background": {
     "service_worker": "background.js"
   },
-  "icons": {
-    "128": "icons/icon128.png"
-  }
+  "action": {
+    "default_popup": "popup/popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["palette.js"],
+      "all_frames": false
+    }
+  ]
 }
